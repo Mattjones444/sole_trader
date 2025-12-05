@@ -47,7 +47,8 @@ exports.loginTrader = async (req, res) => {
         req.session.traderName = trader.name;
 
         // Render index.ejs
-        res.render('index', { traderName: trader.name });
+        res.redirect('/dashboard');
+
     } catch (err) {
         console.error(err);
         res.send("Error logging in: " + err.message);
@@ -58,7 +59,7 @@ exports.loginTrader = async (req, res) => {
 exports.logoutTrader = (req, res) => {
     req.session.destroy(err => {
         if (err) return res.send("Error logging out");
-        res.redirect('/login');
+        res.redirect('/');
     });
 };
 
@@ -68,6 +69,23 @@ exports.isAuthenticated = (req, res, next) => {
         next();
     } else {
         res.redirect('/login');
+    }
+};
+
+exports.showDashboard = async (req, res) => {
+    try {
+        const trader = await Trader.findById(req.session.traderId);
+        if (!trader) return res.redirect('/login');
+
+        res.render('dashboard', {
+            trader,
+            pendingBookings: [],   // empty array for now
+            completedBookings: [], // empty array for now
+            services: []           // empty array for now
+        });
+    } catch (err) {
+        console.error(err);
+        res.send("Error loading dashboard");
     }
 };
 

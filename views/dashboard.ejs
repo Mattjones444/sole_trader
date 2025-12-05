@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trader Dashboard</title>
+    <link rel="stylesheet" href="/styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="/">Sole Traders</a>
+            <div class="d-flex">
+                <span class="navbar-text me-3">
+                    Welcome, <%= trader.name %>
+                </span>
+                <a href="/logout" class="btn btn-outline-danger btn-sm">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="mb-4">Dashboard</h1>
+
+        <!-- Trader Profile Panel -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        My Profile
+                        <a href="/profile/edit" class="btn btn-primary btn-sm">Edit Profile</a>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Name:</strong> <%= trader.name %></p>
+                        <p><strong>Username:</strong> <%= trader.username %></p>
+                        <p><strong>Email:</strong> <%= trader.email %></p>
+                        <p><strong>Trade Type:</strong> <%= trader.tradeType %></p>
+                        <p><strong>Region:</strong> <%= trader.region %></p>
+                        <% if (trader.bio) { %>
+                            <p><strong>Bio:</strong> <%= trader.bio %></p>
+                        <% } %>
+                        <% if (trader.availability) { %>
+                            <p><strong>Availability:</strong> <%= trader.availability %></p>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- My Jobs Panel -->
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        My Jobs
+                    </div>
+                    <div class="card-body">
+                        <p>Pending jobs and requests will appear here.</p>
+                        <ul class="list-group">
+                            <% if (pendingBookings && pendingBookings.length > 0) { %>
+                                <% pendingBookings.forEach(booking => { %>
+                                    <li class="list-group-item">
+                                        <strong><%= booking.clientName %></strong> - <%= booking.serviceTitle %> 
+                                        on <%= booking.requestedDateTime.toLocaleString() %>
+                                        <div class="mt-2">
+                                            <button class="btn btn-success btn-sm">Accept</button>
+                                            <button class="btn btn-danger btn-sm">Reject</button>
+                                        </div>
+                                    </li>
+                                <% }) %>
+                            <% } else { %>
+                                <li class="list-group-item">No pending jobs</li>
+                            <% } %>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Completed Jobs Panel -->
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        Completed Jobs
+                    </div>
+                    <div class="card-body">
+                        <p>Jobs you have completed.</p>
+                        <ul class="list-group">
+                            <% if (completedBookings && completedBookings.length > 0) { %>
+                                <% completedBookings.forEach(booking => { %>
+                                    <li class="list-group-item">
+                                        <strong><%= booking.clientName %></strong> - <%= booking.serviceTitle %>
+                                        <span class="text-muted">on <%= booking.requestedDateTime.toLocaleDateString() %></span>
+                                    </li>
+                                <% }) %>
+                            <% } else { %>
+                                <li class="list-group-item">No completed jobs</li>
+                            <% } %>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Services Panel -->
+            <div class="col-md-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        Services
+                        <a href="/services/add" class="btn btn-primary btn-sm">Add Service</a>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group">
+                            <% if (services && services.length > 0) { %>
+                                <% services.forEach(service => { %>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span><%= service.title %> - £<%= service.basePrice %></span>
+                                        <div>
+                                            <a href="/services/edit/<%= service._id %>" class="btn btn-warning btn-sm">Edit</a>
+                                            <a href="/services/delete/<%= service._id %>" class="btn btn-danger btn-sm">Delete</a>
+                                        </div>
+                                    </li>
+                                <% }) %>
+                            <% } else { %>
+                                <li class="list-group-item">No services added yet</li>
+                            <% } %>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

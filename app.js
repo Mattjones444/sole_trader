@@ -57,3 +57,9 @@ app.get('/login', (req, res) => res.render('login'));
 app.post('/login', traderController.loginTrader);
 app.get('/logout', traderController.logoutTrader);
 
+const traderRoutes = require('./routes/traderRoutes');
+app.use('/', traderRoutes);
+
+app.use((req, res) => {
+    res.status(404).send('Sorry! Page does not exist!');
+});

@@ -11,9 +11,11 @@ router.get('/login', (req, res) => res.render('login'));
 router.post('/login', traderController.loginTrader);
 router.get('/logout', traderController.logoutTrader);
 
-// Protected dashboard
-router.get('/dashboard', traderController.isAuthenticated, (req, res) => {
-    res.send(`Welcome to your dashboard, ${req.session.traderName}`);
-});
+// Protected dashboard route
+router.get(
+  '/dashboard',
+  traderController.isAuthenticated, 
+  traderController.showDashboard   
+);
 
 module.exports = router;
