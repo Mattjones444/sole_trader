@@ -38,6 +38,8 @@ app.use(express.static(path.join(__dirname,'public')));
 app.set('view engine','ejs');
 app.set('views',path.join(__dirname,'views'));
 app.use(express.static(path.join(__dirname,'public')));
+app.use(express.json());
+
 
 //Homepage route
 app.get('/',(req,res)=>{
@@ -63,6 +65,9 @@ app.use('/', traderRoutes);
 
 const serviceRoutes = require('./routes/serviceRoutes');
 app.use('/', serviceRoutes);
+
+const bookingRoutes = require('./routes/bookingRoutes');
+app.use('/', bookingRoutes);
 
 app.use((req, res) => {
     res.status(404).send('Sorry! Page does not exist!');
