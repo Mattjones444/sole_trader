@@ -14,6 +14,10 @@ const ServiceSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
+    category: {             
+    type: String,
+    required: true
+    },
     pricingType: {
         type:String,
         enum: ['hourly','fixed'],

@@ -9,6 +9,7 @@ const Trader = require('./models/Trader');
 const Service = require('./models/Service');
 const Booking = require('./models/Booking');
 
+
 //Load environment variables
 dotenv.config();
 
@@ -60,6 +61,12 @@ app.get('/logout', traderController.logoutTrader);
 const traderRoutes = require('./routes/traderRoutes');
 app.use('/', traderRoutes);
 
+const serviceRoutes = require('./routes/serviceRoutes');
+app.use('/', serviceRoutes);
+
 app.use((req, res) => {
     res.status(404).send('Sorry! Page does not exist!');
 });
+
+
+
