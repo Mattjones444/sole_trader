@@ -51,20 +51,31 @@
             <!-- My Jobs Panel -->
             <div class="col-md-4">
                 <div class="card h-100">
-                    <div class="card-header">
-                        My Jobs
-                    </div>
+                    <div class="card-header">My Jobs</div>
                     <div class="card-body">
                         <p>Pending jobs and requests will appear here.</p>
                         <ul class="list-group">
                             <% if (pendingBookings && pendingBookings.length > 0) { %>
                                 <% pendingBookings.forEach(booking => { %>
-                                    <li class="list-group-item">
-                                        <strong><%= booking.clientName %></strong> - <%= booking.serviceTitle %> 
-                                        on <%= booking.requestedDateTime.toLocaleString() %>
-                                        <div class="mt-2">
-                                            <button class="btn btn-success btn-sm">Accept</button>
-                                            <button class="btn btn-danger btn-sm">Reject</button>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong><%= booking.clientName %></strong> - <%= booking.serviceTitle %>
+                                            <br>
+                                            <small>on <%= new Date(booking.requestedDateTime).toLocaleString() %></small>
+                                        </div>
+                                        <div>
+                                            <button class="btn btn-info btn-sm view-details-btn" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#bookingModal"
+                                                    data-client="<%= booking.clientName %>"
+                                                    data-email="<%= booking.clientEmail %>"
+                                                    data-service="<%= booking.serviceTitle %>"
+                                                    data-date="<%= new Date(booking.requestedDateTime).toLocaleString() %>"
+                                                    data-description="<%= booking.jobDescription %>">
+                                                View
+                                            </button>
+                                            <button class="btn btn-success btn-sm accept-btn" data-id="<%= booking._id %>">Accept</button>
+                                            <button class="btn btn-danger btn-sm reject-btn" data-id="<%= booking._id %>">Reject</button>
                                         </div>
                                     </li>
                                 <% }) %>
@@ -89,7 +100,7 @@
                                 <% completedBookings.forEach(booking => { %>
                                     <li class="list-group-item">
                                         <strong><%= booking.clientName %></strong> - <%= booking.serviceTitle %>
-                                        <span class="text-muted">on <%= booking.requestedDateTime.toLocaleDateString() %></span>
+                                        <span class="text-muted">on <%= new Date(booking.requestedDateTime).toLocaleDateString() %></span>
                                     </li>
                                 <% }) %>
                             <% } else { %>
@@ -128,5 +139,45 @@
             </div>
         </div>
     </div>
+
+    <!-- Booking Details Modal -->
+    <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="bookingModalLabel">Booking Details</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p><strong>Client Name:</strong> <span id="modalClient"></span></p>
+            <p><strong>Client Email:</strong> <span id="modalEmail"></span></p>
+            <p><strong>Service:</strong> <span id="modalService"></span></p>
+            <p><strong>Date/Time:</strong> <span id="modalDate"></span></p>
+            <p><strong>Description:</strong> <span id="modalDescription"></span></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script to populate modal -->
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const modal = document.getElementById('bookingModal');
+      modal.addEventListener('show.bs.modal', event => {
+        const button = event.relatedTarget;
+        document.getElementById('modalClient').textContent = button.getAttribute('data-client');
+        document.getElementById('modalEmail').textContent = button.getAttribute('data-email');
+        document.getElementById('modalService').textContent = button.getAttribute('data-service');
+        document.getElementById('modalDate').textContent = button.getAttribute('data-date');
+        document.getElementById('modalDescription').textContent = button.getAttribute('data-description');
+      });
+    });
+    </script>
 </body>
 </html>
