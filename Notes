@@ -1,0 +1,22 @@
+Job location is missing from the booking form and not currently displayed.
+Check that on registration, username and email address are unique
+Does the system maintain login state using sessions?
+Can a trader log out, thus destroying the sessions?
+Are the correct pages restricted for traders?
+Validation on profile fields?
+Validation on service listings?
+Separate page for trader information for each registered trader?
+Are bookings stored as pending when requested?
+Validation on client details inputted
+Confirmation message on screen for long enough?
+Does the status field of the requested booking change depending on the buttons?
+Filtering of bookings on the traders dashboard
+Test whether you can access trader only routes through the URL
+Look into injection or XSS risks
+Check for mobile and desktop
+
+Could have...
+Star ratings for traders displayed on traders.ejs page
+Average star rating per trader
+Statistics on the dashboard, eg. jobs completed, bookings per month
+Detect and prevent overlapping requests for bookings

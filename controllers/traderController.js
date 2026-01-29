@@ -77,13 +77,45 @@ exports.loginTrader = async (req, res) => {
   }
 };
 
-// Logout
+exports.checkAvailability = async (req, res) => {
+  try {
+    const username = (req.query.username || '').trim().toLowerCase();
+    const email = (req.query.email || '').trim().toLowerCase();
+
+    // If neither provided, nothing to check
+    if (!username && !email) {
+      return res.json({ usernameAvailable: true, emailAvailable: true });
+    }
+
+    const or = [];
+    if (username) or.push({ username });
+    if (email) or.push({ email });
+
+    const existing = await Trader.findOne({ $or: or }).select('username email').lean();
+
+    // If found, work out which field(s) collide
+    const usernameAvailable = username ? !(existing && existing.username === username) : true;
+    const emailAvailable = email ? !(existing && existing.email === email) : true;
+
+    return res.json({ usernameAvailable, emailAvailable });
+  } catch (err) {
+    console.error('checkAvailability error:', err);
+    // Don’t block typing UX if server errors — just say "available" and let submit validation catch it.
+    return res.json({ usernameAvailable: true, emailAvailable: true });
+  }
+};
+
+//Logout
 exports.logoutTrader = (req, res) => {
   req.session.destroy(err => {
     if (err) return res.status(500).send("Error logging out");
-    res.redirect('/');
+
+    // cookie name is usually "connect.sid" unless you changed it
+    res.clearCookie('connect.sid');
+    return res.redirect('/');
   });
 };
+
 
 // Middleware: check authentication and attach trader to req
 exports.isAuthenticated = async (req, res, next) => {

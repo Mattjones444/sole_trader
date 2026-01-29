@@ -2,23 +2,34 @@ const express = require('express');
 const router = express.Router();
 const traderController = require('../controllers/traderController');
 
+// =====================
 // Registration routes
+// =====================
 router.get('/register', (req, res) => res.render('register'));
 router.post('/register', traderController.registerTrader);
 
-// Login/logout routes
+// 🔍 Live username / email availability check (AJAX)
+router.get('/auth/check-availability', traderController.checkAvailability);
+
+// =====================
+// Login / logout routes
+// =====================
 router.get('/login', (req, res) => res.render('login'));
 router.post('/login', traderController.loginTrader);
 router.get('/logout', traderController.logoutTrader);
 
+// =====================
 // Protected dashboard route
+// =====================
 router.get(
   '/dashboard',
-  traderController.isAuthenticated, 
-  traderController.showDashboard   
+  traderController.isAuthenticated,
+  traderController.showDashboard
 );
 
-//Show all traders
+// =====================
+// Public trader directory
+// =====================
 router.get('/traders', traderController.showAllTraders);
 
 module.exports = router;
