@@ -204,10 +204,19 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
-      <div class="modal-body">
+       <div class="modal-body">
+        <!-- CHANGED: Trade Type is now a dropdown again -->
         <div class="mb-3">
           <label class="form-label">Trade Type</label>
-          <input type="text" class="form-control" id="profileTradeType" value="<%= trader.tradeType || '' %>" required>
+          <select class="form-select" id="profileTradeType" required>
+            <option value="">Select…</option>
+            <option value="Plumbing" <%= trader.tradeType === 'Plumbing' ? 'selected' : '' %>>Plumbing</option>
+            <option value="Electrical" <%= trader.tradeType === 'Electrical' ? 'selected' : '' %>>Electrical</option>
+            <option value="Cleaning" <%= trader.tradeType === 'Cleaning' ? 'selected' : '' %>>Cleaning</option>
+            <option value="Carpentry" <%= trader.tradeType === 'Carpentry' ? 'selected' : '' %>>Carpentry</option>
+            <option value="Gardening" <%= trader.tradeType === 'Gardening' ? 'selected' : '' %>>Gardening</option>
+            <option value="Painting" <%= trader.tradeType === 'Painting' ? 'selected' : '' %>>Painting</option>
+          </select>
         </div>
 
         <div class="mb-3">
@@ -217,12 +226,14 @@
 
         <div class="mb-3">
           <label class="form-label">Availability</label>
-          <input type="text" class="form-control" id="profileAvailability" value="<%= trader.availability || '' %>">
+          <input type="text" class="form-control" id="profileAvailability" value="<%= trader.availability || '' %>" required>
         </div>
 
         <div class="mb-3">
           <label class="form-label">Short Bio</label>
-          <textarea class="form-control" id="profileBio" rows="3"><%= trader.bio || '' %></textarea>
+          <textarea
+  class="form-control"
+  id="profileBio" rows="3" required><%= trader.bio || '' %></textarea>
         </div>
 
         <div class="alert alert-success d-none" id="profileSavedMsg">Profile updated.</div>
