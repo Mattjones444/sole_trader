@@ -18,4 +18,7 @@ router.get(
   traderController.showDashboard   
 );
 
+//Show all traders
+router.get('/traders', traderController.showAllTraders);
+
 module.exports = router;

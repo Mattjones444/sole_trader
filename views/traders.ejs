@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Trader Directory</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container">
+    <a class="navbar-brand" href="/">Sole Traders</a>
+    <div class="ms-auto">
+      <a href="/services" class="btn btn-outline-primary btn-sm me-2">View Services</a>
+      <a href="/login" class="btn btn-outline-primary btn-sm me-2">Login</a>
+      <a href="/register" class="btn btn-primary btn-sm">Register</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4">
+  <h1 class="mb-3">Trader Directory</h1>
+  <p class="text-muted mb-4">Browse traders and view their services.</p>
+
+  <!-- FILTERS -->
+  <div class="row g-2 mb-4">
+    <div class="col-md-4">
+      <input id="searchInput" type="text" class="form-control" placeholder="Search by name..." />
+    </div>
+
+    <div class="col-md-4">
+      <select id="tradeTypeFilter" class="form-select">
+        <option value="all">All Trade Types</option>
+        <option value="plumbing">Plumbing</option>
+        <option value="electrical">Electrical</option>
+        <option value="cleaning">Cleaning</option>
+        <option value="carpentry">Carpentry</option>
+        <option value="gardening">Gardening</option>
+        <option value="painting">Painting</option>
+      </select>
+    </div>
+
+    <div class="col-md-4">
+      <input id="regionFilter" type="text" class="form-control" placeholder="Filter by region/town..." />
+    </div>
+  </div>
+
+  <div id="noResults" class="alert alert-warning d-none">
+    No traders match your filters.
+  </div>
+
+  <!-- TRADER CARDS -->
+  <div class="row g-4" id="traderContainer">
+    <% if (traders && traders.length > 0) { %>
+      <% traders.forEach(trader => { %>
+        <div
+          class="col-md-6 col-lg-4 trader-card"
+          data-name="<%= trader.name ? trader.name.toLowerCase().trim() : '' %>"
+          data-tradetype="<%= trader.tradeType ? trader.tradeType.toLowerCase().trim() : '' %>"
+          data-region="<%= trader.region ? trader.region.toLowerCase().trim() : '' %>"
+        >
+          <div class="card h-100 shadow-sm">
+            <div class="card-body d-flex flex-column">
+              <h5 class="card-title mb-2"><%= trader.name %></h5>
+
+              <p class="mb-1">
+                <strong>Trade Type:</strong> <%= trader.tradeType %>
+              </p>
+
+              <p class="mb-3">
+                <strong>Region/Town:</strong> <%= trader.region %>
+              </p>
+
+              <button
+                type="button"
+                class="btn btn-primary btn-sm mt-auto view-profile-btn"
+                data-bs-toggle="modal"
+                data-bs-target="#traderProfileModal"
+                data-trader-id="<%= trader._id %>"
+                data-trader-name="<%= trader.name %>"
+                data-trader-tradetype="<%= trader.tradeType || '' %>"
+                data-trader-region="<%= trader.region || '' %>"
+                data-trader-bio="<%= trader.bio || '' %>"
+                data-trader-availability="<%= trader.availability || '' %>"
+              >
+                View Profile
+              </button>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    <% } else { %>
+      <p>No traders available right now.</p>
+    <% } %>
+  </div>
+</div>
+
+<!-- =========================
+     TRADER PROFILE MODAL
+========================= -->
+<div class="modal fade" id="traderProfileModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Trader Profile</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <h5 id="profileTraderName"></h5>
+        <p><strong>Trade Type:</strong> <span id="profileTradeType"></span></p>
+        <p><strong>Region/Town:</strong> <span id="profileRegion"></span></p>
+
+        <div id="bioBlock" class="d-none">
+          <strong>Bio:</strong>
+          <p id="profileBio" class="text-muted"></p>
+        </div>
+
+        <div id="availabilityBlock" class="d-none">
+          <strong>Availability:</strong>
+          <span id="profileAvailability"></span>
+        </div>
+
+        <hr />
+
+        <h5>Services</h5>
+
+        <div id="servicesEmpty" class="alert alert-secondary d-none">
+          This trader has not added any services yet.
+        </div>
+
+        <div id="servicesList" class="list-group d-none"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- REQUEST SERVICE MODAL -->
+<div class="modal fade" id="requestServiceModal" tabindex="-1">
+  <div class="modal-dialog">
+    <form id="requestServiceForm" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="requestServiceLabel">Request Service</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Add name attributes too (handy if you ever submit normally) -->
+        <input type="hidden" id="serviceId" name="serviceId" />
+        <input type="hidden" id="traderId" name="traderId" />
+
+        <div class="mb-3">
+          <label class="form-label">Name</label>
+          <input class="form-control" id="clientName" name="clientName" required />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" id="clientEmail" name="clientEmail" required />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Requested Date & Time</label>
+          <input type="datetime-local" class="form-control" id="requestedDateTime" name="requestedDateTime" required />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Job Description</label>
+          <textarea class="form-control" id="jobDescription" name="jobDescription" required></textarea>
+        </div>
+
+        <div id="requestError" class="alert alert-danger d-none">
+          Error submitting request. Please try again.
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button class="btn btn-primary" type="submit">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal fade" id="requestSuccessModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Request Sent</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        Your service request has been submitted successfully.
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  const ALL_TRADERS = <%- JSON.stringify(traders || [])
+    .replace(/</g, '\\u003c')
+    .replace(/>/g, '\\u003e')
+    .replace(/&/g, '\\u0026')
+  %>;
+
+  // ===== Filters =====
+  const searchInput = document.getElementById('searchInput');
+  const tradeTypeFilter = document.getElementById('tradeTypeFilter');
+  const regionFilter = document.getElementById('regionFilter');
+  const cards = document.querySelectorAll('.trader-card');
+  const noResults = document.getElementById('noResults');
+
+  function applyFilters() {
+    let visible = 0;
+    cards.forEach(card => {
+      const matches =
+        (!searchInput.value || card.dataset.name.includes(searchInput.value.toLowerCase())) &&
+        (tradeTypeFilter.value === 'all' || card.dataset.tradetype === tradeTypeFilter.value) &&
+        (!regionFilter.value || card.dataset.region.includes(regionFilter.value.toLowerCase()));
+
+      card.style.display = matches ? '' : 'none';
+      if (matches) visible++;
+    });
+
+    noResults.classList.toggle('d-none', visible > 0);
+  }
+
+  searchInput?.addEventListener('input', applyFilters);
+  tradeTypeFilter?.addEventListener('change', applyFilters);
+  regionFilter?.addEventListener('input', applyFilters);
+
+  // ===== Modals =====
+  const traderProfileModalEl = document.getElementById('traderProfileModal');
+  const requestServiceModalEl = document.getElementById('requestServiceModal');
+  const requestSuccessModalEl = document.getElementById('requestSuccessModal');
+
+  const requestServiceModal = new bootstrap.Modal(requestServiceModalEl);
+  const requestSuccessModal = new bootstrap.Modal(requestSuccessModalEl);
+
+  // Request form elements (DON'T rely on id->global)
+  const requestForm = document.getElementById('requestServiceForm');
+  const requestError = document.getElementById('requestError');
+
+  const serviceIdEl = document.getElementById('serviceId');
+  const traderIdEl = document.getElementById('traderId');
+  const clientNameEl = document.getElementById('clientName');
+  const clientEmailEl = document.getElementById('clientEmail');
+  const requestedDateTimeEl = document.getElementById('requestedDateTime');
+  const jobDescriptionEl = document.getElementById('jobDescription');
+  const requestServiceLabel = document.getElementById('requestServiceLabel');
+
+  // Build profile modal services list
+  traderProfileModalEl?.addEventListener('show.bs.modal', e => {
+    const btn = e.relatedTarget;
+    const trader = ALL_TRADERS.find(t => String(t._id) === String(btn.dataset.traderId));
+
+    document.getElementById('profileTraderName').textContent = btn.dataset.traderName || '';
+    document.getElementById('profileTradeType').textContent = btn.dataset.traderTradetype || '';
+    document.getElementById('profileRegion').textContent = btn.dataset.traderRegion || '';
+
+    const servicesList = document.getElementById('servicesList');
+    const servicesEmpty = document.getElementById('servicesEmpty');
+    servicesList.innerHTML = '';
+
+    if (!trader || !trader.services?.length) {
+      servicesEmpty.classList.remove('d-none');
+      servicesList.classList.add('d-none');
+      return;
+    }
+
+    servicesEmpty.classList.add('d-none');
+    servicesList.classList.remove('d-none');
+
+    trader.services.forEach(service => {
+      servicesList.innerHTML += `
+        <div class="list-group-item d-flex justify-content-between">
+          <div>
+            <strong>${escapeHtml(service.title || 'Service')}</strong><br>
+            <small>${escapeHtml(service.description || '')}</small>
+          </div>
+          <button class="btn btn-sm btn-primary request-from-trader-btn"
+            data-service-id="${service._id}"
+            data-trader-id="${trader._id}"
+            data-service-title="${escapeHtml(service.title || 'Service')}"
+            data-trader-name="${escapeHtml(trader.name || 'Trader')}">
+            Request
+          </button>
+        </div>`;
+    });
+  });
+
+  // Open request modal from service list
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('.request-from-trader-btn');
+    if (!btn) return;
+
+    // set hidden ids
+    serviceIdEl.value = btn.dataset.serviceId || '';
+    traderIdEl.value = btn.dataset.traderId || '';
+
+    // label
+    requestServiceLabel.textContent =
+      `Request Service: ${btn.dataset.serviceTitle || 'Service'} (${btn.dataset.traderName || 'Trader'})`;
+
+    // clear any previous error
+    requestError.classList.add('d-none');
+
+    // show modal
+    requestServiceModal.show();
+  });
+
+  // ===== SUBMIT booking request (this was missing) =====
+  requestForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    requestError.classList.add('d-none');
+
+    const payload = {
+      serviceId: serviceIdEl.value,
+      traderId: traderIdEl.value,
+      clientName: clientNameEl.value,
+      clientEmail: clientEmailEl.value,
+      requestedDateTime: requestedDateTimeEl.value, // datetime-local string
+      jobDescription: jobDescriptionEl.value
+    };
+
+    try {
+      const res = await fetch('/book-service', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      // If your backend returns JSON errors, you can log them:
+      // const text = await res.text(); console.log('book-service response:', res.status, text);
+
+      if (!res.ok) {
+        requestError.classList.remove('d-none');
+        return;
+      }
+
+      // Hide request modal, reset, show success
+      const requestModalInstance = bootstrap.Modal.getInstance(requestServiceModalEl);
+      requestModalInstance?.hide();
+
+      requestForm.reset();
+      requestSuccessModal.show();
+    } catch (err) {
+      console.error('Booking request failed:', err);
+      requestError.classList.remove('d-none');
+    }
+  });
+
+  function escapeHtml(str) {
+    return String(str)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
+</script>
+
+</body>
+</html>

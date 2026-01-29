@@ -69,6 +69,9 @@ app.use('/', serviceRoutes);
 const bookingRoutes = require('./routes/bookingRoutes');
 app.use('/', bookingRoutes);
 
+const profileRoutes = require('./routes/profileRoutes');
+app.use('/', profileRoutes);
+
 app.use((req, res) => {
     res.status(404).send('Sorry! Page does not exist!');
 });

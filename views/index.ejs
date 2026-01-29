@@ -2,37 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Sole Traders Home</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin-top: 50px;
-    }
-    .btn {
-      display: inline-block;
-      padding: 10px 20px;
-      margin: 10px;
-      font-size: 16px;
-      text-decoration: none;
-      color: white;
-      background-color: #007BFF;
-      border-radius: 5px;
-    }
-    .btn:hover {
-      background-color: #0056b3;
-    }
-  </style>
+  <title>Sole Traders</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-  <h1>Welcome to Sole Traders!</h1>
-  <p>This is your home page.</p>
 
-  <!-- Login and Register buttons -->
-  <a href="/login" class="btn">Login</a>
-  <a href="/register" class="btn">Register</a>
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container">
+    <a class="navbar-brand" href="/">Sole Traders</a>
+    <div class="ms-auto">
+      <a href="/login" class="btn btn-outline-primary me-2">Login</a>
+      <a href="/register" class="btn btn-primary">Register</a>
+    </div>
+  </div>
+</nav>
 
-  <!-- View Services button -->
-  <a href="/services" class="btn">View Services</a>
+<!-- HERO SECTION -->
+<section class="py-5">
+  <div class="container text-center">
+    <!-- Placeholder for hero image -->
+    <div class="mb-4">
+      <!-- Add hero image here later -->
+    </div>
+
+    <h1 class="mb-3">Find trusted local tradespeople</h1>
+    <p class="mb-4">
+      Browse services or search for traders in your area.
+    </p>
+
+    <div>
+      <a href="/services" class="btn btn-primary btn-lg me-3">
+        View Services
+      </a>
+      <a href="/traders" class="btn btn-outline-light btn-lg">
+        Search Traders
+      </a>
+    </div>
+  </div>
+</section>
+
 </body>
 </html>

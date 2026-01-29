@@ -1,183 +1,530 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Trader Dashboard</title>
-    <link rel="stylesheet" href="/styles.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Trader Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="/">Sole Traders</a>
-            <div class="d-flex">
-                <span class="navbar-text me-3">
-                    Welcome, <%= trader.name %>
-                </span>
-                <a href="/logout" class="btn btn-outline-danger btn-sm">Logout</a>
-            </div>
-        </div>
-    </nav>
 
-    <div class="container">
-        <h1 class="mb-4">Dashboard</h1>
-
-        <!-- Trader Profile Panel -->
-        <div class="row mb-4">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        My Profile
-                        <a href="/profile/edit" class="btn btn-primary btn-sm">Edit Profile</a>
-                    </div>
-                    <div class="card-body">
-                        <p><strong>Name:</strong> <%= trader.name %></p>
-                        <p><strong>Username:</strong> <%= trader.username %></p>
-                        <p><strong>Email:</strong> <%= trader.email %></p>
-                        <p><strong>Trade Type:</strong> <%= trader.tradeType %></p>
-                        <p><strong>Region:</strong> <%= trader.region %></p>
-                        <% if (trader.bio) { %>
-                            <p><strong>Bio:</strong> <%= trader.bio %></p>
-                        <% } %>
-                        <% if (trader.availability) { %>
-                            <p><strong>Availability:</strong> <%= trader.availability %></p>
-                        <% } %>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row g-4">
-            <!-- My Jobs Panel -->
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-header">My Jobs</div>
-                    <div class="card-body">
-                        <p>Pending jobs and requests will appear here.</p>
-                        <ul class="list-group">
-                            <% if (pendingBookings && pendingBookings.length > 0) { %>
-                                <% pendingBookings.forEach(booking => { %>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <strong><%= booking.clientName %></strong> - <%= booking.serviceTitle %>
-                                            <br>
-                                            <small>on <%= new Date(booking.requestedDateTime).toLocaleString() %></small>
-                                        </div>
-                                        <div>
-                                            <button class="btn btn-info btn-sm view-details-btn" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#bookingModal"
-                                                    data-client="<%= booking.clientName %>"
-                                                    data-email="<%= booking.clientEmail %>"
-                                                    data-service="<%= booking.serviceTitle %>"
-                                                    data-date="<%= new Date(booking.requestedDateTime).toLocaleString() %>"
-                                                    data-description="<%= booking.jobDescription %>">
-                                                View
-                                            </button>
-                                            <button class="btn btn-success btn-sm accept-btn" data-id="<%= booking._id %>">Accept</button>
-                                            <button class="btn btn-danger btn-sm reject-btn" data-id="<%= booking._id %>">Reject</button>
-                                        </div>
-                                    </li>
-                                <% }) %>
-                            <% } else { %>
-                                <li class="list-group-item">No pending jobs</li>
-                            <% } %>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Completed Jobs Panel -->
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-header">
-                        Completed Jobs
-                    </div>
-                    <div class="card-body">
-                        <p>Jobs you have completed.</p>
-                        <ul class="list-group">
-                            <% if (completedBookings && completedBookings.length > 0) { %>
-                                <% completedBookings.forEach(booking => { %>
-                                    <li class="list-group-item">
-                                        <strong><%= booking.clientName %></strong> - <%= booking.serviceTitle %>
-                                        <span class="text-muted">on <%= new Date(booking.requestedDateTime).toLocaleDateString() %></span>
-                                    </li>
-                                <% }) %>
-                            <% } else { %>
-                                <li class="list-group-item">No completed jobs</li>
-                            <% } %>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Services Panel -->
-            <div class="col-md-4">
-                <div class="card h-100">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        Services
-                        <a href="/services/add" class="btn btn-primary btn-sm">Add Service</a>
-                    </div>
-                    <div class="card-body">
-                        <ul class="list-group">
-                            <% if (services && services.length > 0) { %>
-                                <% services.forEach(service => { %>
-                                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                                        <span><%= service.title %> - £<%= service.basePrice %></span>
-                                        <div>
-                                            <a href="/services/edit/<%= service._id %>" class="btn btn-warning btn-sm">Edit</a>
-                                            <a href="/services/delete/<%= service._id %>" class="btn btn-danger btn-sm">Delete</a>
-                                        </div>
-                                    </li>
-                                <% }) %>
-                            <% } else { %>
-                                <li class="list-group-item">No services added yet</li>
-                            <% } %>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
+<nav class="navbar navbar-light bg-light mb-4">
+  <div class="container">
+    <a class="navbar-brand" href="/">Sole Traders</a>
+    <div>
+      <span class="me-3">Welcome, <%= trader.name %></span>
+      <a href="/logout" class="btn btn-outline-danger btn-sm">Logout</a>
     </div>
+  </div>
+</nav>
 
-    <!-- Booking Details Modal -->
-    <div class="modal fade" id="bookingModal" tabindex="-1" aria-labelledby="bookingModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="bookingModalLabel">Booking Details</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <p><strong>Client Name:</strong> <span id="modalClient"></span></p>
-            <p><strong>Client Email:</strong> <span id="modalEmail"></span></p>
-            <p><strong>Service:</strong> <span id="modalService"></span></p>
-            <p><strong>Date/Time:</strong> <span id="modalDate"></span></p>
-            <p><strong>Description:</strong> <span id="modalDescription"></span></p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Close</button>
-          </div>
+<div class="container">
+  <h1 class="mb-4">Dashboard</h1>
+
+  <!-- PROFILE PANEL -->
+  <div class="card mb-4">
+    <div class="card-header d-flex justify-content-between">
+      My Profile
+      <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+        Edit Profile
+      </button>
+    </div>
+    <div class="card-body">
+      <p><strong>Name:</strong> <%= trader.name %></p>
+      <p><strong>Email:</strong> <%= trader.email %></p>
+      <p><strong>Trade Type:</strong> <%= trader.tradeType %></p>
+      <p><strong>Region:</strong> <%= trader.region %></p>
+      <% if (trader.availability) { %>
+        <p><strong>Availability:</strong> <%= trader.availability %></p>
+      <% } %>
+      <% if (trader.bio) { %>
+        <p><strong>Bio:</strong> <%= trader.bio %></p>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="row g-4">
+
+    <!-- MY JOBS -->
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-header">My Jobs</div>
+        <div class="card-body">
+          <ul class="list-group">
+            <% if (pendingBookings && pendingBookings.length > 0) { %>
+              <% pendingBookings.forEach(b => { %>
+                <li class="list-group-item">
+                  <strong><%= b.clientName %></strong><br>
+                  <small><%= b.requestedDateTime ? new Date(b.requestedDateTime).toLocaleString('en-GB') : '' %></small>
+                  <div class="mt-2 d-flex gap-1">
+                    <button type="button" class="btn btn-info btn-sm"
+                      data-bs-toggle="modal"
+                      data-bs-target="#viewBookingModal"
+                      data-client="<%= b.clientName %>"
+                      data-email="<%= b.clientEmail %>"
+                      data-description="<%= b.jobDescription %>"
+                      data-datetime="<%= b.requestedDateTime ? new Date(b.requestedDateTime).toISOString() : '' %>">
+                      View
+                    </button>
+                    <button type="button" class="btn btn-success btn-sm accept-btn" data-id="<%= b._id %>">Accept</button>
+                    <button type="button" class="btn btn-danger btn-sm reject-btn" data-id="<%= b._id %>">Reject</button>
+                  </div>
+                </li>
+              <% }) %>
+            <% } else { %>
+              <li class="list-group-item">No pending jobs</li>
+            <% } %>
+          </ul>
         </div>
       </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- COMPLETED JOBS -->
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-header">Completed Jobs</div>
+        <div class="card-body">
+          <ul class="list-group">
+            <% if (completedBookings && completedBookings.length > 0) { %>
+              <% completedBookings.forEach(b => { %>
+                <li class="list-group-item">
+                  <strong><%= b.clientName %></strong>
+                  <br>
+                  <small><%= b.requestedDateTime ? new Date(b.requestedDateTime).toLocaleDateString('en-GB') : '' %></small>
+                </li>
+              <% }) %>
+            <% } else { %>
+              <li class="list-group-item">No completed jobs</li>
+            <% } %>
+          </ul>
+        </div>
+      </div>
+    </div>
 
-    <!-- Script to populate modal -->
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const modal = document.getElementById('bookingModal');
-      modal.addEventListener('show.bs.modal', event => {
-        const button = event.relatedTarget;
-        document.getElementById('modalClient').textContent = button.getAttribute('data-client');
-        document.getElementById('modalEmail').textContent = button.getAttribute('data-email');
-        document.getElementById('modalService').textContent = button.getAttribute('data-service');
-        document.getElementById('modalDate').textContent = button.getAttribute('data-date');
-        document.getElementById('modalDescription').textContent = button.getAttribute('data-description');
-      });
+    <!-- SERVICES -->
+    <div class="col-md-4">
+      <div class="card h-100">
+        <div class="card-header d-flex justify-content-between">
+          Services
+          <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addServiceModal">
+            Add Service
+          </button>
+        </div>
+        <div class="card-body">
+          <ul class="list-group">
+            <% if (services && services.length > 0) { %>
+              <% services.forEach(s => { %>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <span><%= s.title %> (£<%= s.basePrice %>)</span>
+                  <div class="btn-group btn-group-sm">
+                    <button type="button" class="btn btn-warning edit-service-btn"
+                      data-bs-toggle="modal"
+                      data-bs-target="#editServiceModal"
+                      data-id="<%= s._id %>"
+                      data-title="<%= s.title %>"
+                      data-description="<%= s.description %>"
+                      data-category="<%= s.category %>"
+                      data-pricingtype="<%= s.pricingType %>"
+                      data-baseprice="<%= s.basePrice %>">
+                      Edit
+                    </button>
+                    <button type="button" class="btn btn-danger delete-service-btn" data-id="<%= s._id %>">
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              <% }) %>
+            <% } else { %>
+              <li class="list-group-item">No services added yet</li>
+            <% } %>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= MODALS ================= -->
+
+<!-- VIEW BOOKING MODAL -->
+<div class="modal fade" id="viewBookingModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Booking Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Client:</strong> <span id="modalClient"></span></p>
+        <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+        <p><strong>Requested:</strong> <span id="modalDateTime"></span></p>
+        <p><strong>Description:</strong> <span id="modalDescription"></span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ACCEPT CONFIRMATION MODAL -->
+<div class="modal fade" id="acceptModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body text-center">
+        <h5>Job Accepted</h5>
+        <p>The client has been notified. Please contact them to arrange details.</p>
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REJECT CONFIRMATION MODAL -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body text-center">
+        <h5>Job Rejected</h5>
+        <p>The client has been notified by email.</p>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT PROFILE MODAL -->
+<div class="modal fade" id="editProfileModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="editProfileForm" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Profile</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Trade Type</label>
+          <input type="text" class="form-control" id="profileTradeType" value="<%= trader.tradeType || '' %>" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Region / Town</label>
+          <input type="text" class="form-control" id="profileRegion" value="<%= trader.region || '' %>" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Availability</label>
+          <input type="text" class="form-control" id="profileAvailability" value="<%= trader.availability || '' %>">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Short Bio</label>
+          <textarea class="form-control" id="profileBio" rows="3"><%= trader.bio || '' %></textarea>
+        </div>
+
+        <div class="alert alert-success d-none" id="profileSavedMsg">Profile updated.</div>
+        <div class="alert alert-danger d-none" id="profileErrorMsg">Something went wrong saving your profile.</div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ADD SERVICE MODAL -->
+<div class="modal fade" id="addServiceModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="addServiceForm" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Service</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Title</label>
+          <input type="text" class="form-control" id="serviceTitle" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Description</label>
+          <textarea class="form-control" id="serviceDescription" rows="3" required></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Category</label>
+          <select class="form-select" id="serviceCategory" required>
+            <option value="">Select...</option>
+            <option value="Plumbing">Plumbing</option>
+            <option value="Electrical">Electrical</option>
+            <option value="Cleaning">Cleaning</option>
+            <option value="Carpentry">Carpentry</option>
+            <option value="Gardening">Gardening</option>
+            <option value="Painting">Painting</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Pricing Type</label>
+          <div class="d-flex gap-3">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="pricingType" value="fixed" checked>
+              <label class="form-check-label">Fixed</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="pricingType" value="hourly">
+              <label class="form-check-label">Hourly</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Base Price (£)</label>
+          <input type="number" class="form-control" id="serviceBasePrice" min="0" step="1" required>
+        </div>
+
+        <div class="alert alert-success d-none" id="serviceSavedMsg">Service added.</div>
+        <div class="alert alert-danger d-none" id="serviceErrorMsg">Something went wrong adding the service.</div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save Service</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- EDIT SERVICE MODAL -->
+<div class="modal fade" id="editServiceModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="editServiceForm" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Service</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="editServiceId">
+
+        <div class="mb-3">
+          <label class="form-label">Title</label>
+          <input type="text" class="form-control" id="editServiceTitle" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Description</label>
+          <textarea class="form-control" id="editServiceDescription" rows="3" required></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Category</label>
+          <select class="form-select" id="editServiceCategory" required>
+            <option value="Plumbing">Plumbing</option>
+            <option value="Electrical">Electrical</option>
+            <option value="Cleaning">Cleaning</option>
+            <option value="Carpentry">Carpentry</option>
+            <option value="Gardening">Gardening</option>
+            <option value="Painting">Painting</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Pricing Type</label>
+          <div class="d-flex gap-3">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="editPricingType" value="fixed" id="editPricingFixed">
+              <label class="form-check-label" for="editPricingFixed">Fixed</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="editPricingType" value="hourly" id="editPricingHourly">
+              <label class="form-check-label" for="editPricingHourly">Hourly</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Base Price (£)</label>
+          <input type="number" class="form-control" id="editServiceBasePrice" min="0" step="1" required>
+        </div>
+
+        <div class="alert alert-success d-none" id="editServiceSavedMsg">Service updated.</div>
+        <div class="alert alert-danger d-none" id="editServiceErrorMsg">Something went wrong updating the service.</div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  // View booking modal
+  const viewBookingModal = document.getElementById('viewBookingModal');
+  viewBookingModal.addEventListener('show.bs.modal', e => {
+    const btn = e.relatedTarget;
+
+    document.getElementById('modalClient').textContent = btn.dataset.client || '';
+    document.getElementById('modalEmail').textContent = btn.dataset.email || '';
+    document.getElementById('modalDescription').textContent = btn.dataset.description || '';
+
+    const iso = btn.dataset.datetime || '';
+    document.getElementById('modalDateTime').textContent =
+      iso ? new Date(iso).toLocaleString('en-GB') : 'Not provided';
+  });
+
+  // Accept booking
+  document.querySelectorAll('.accept-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      await fetch(`/bookings/${btn.dataset.id}/accept`, { method: 'POST' });
+      new bootstrap.Modal(document.getElementById('acceptModal')).show();
+      setTimeout(() => location.reload(), 600);
     });
-    </script>
+  });
+
+  // Reject booking
+  document.querySelectorAll('.reject-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      await fetch(`/bookings/${btn.dataset.id}/reject`, { method: 'POST' });
+      new bootstrap.Modal(document.getElementById('rejectModal')).show();
+      setTimeout(() => location.reload(), 600);
+    });
+  });
+
+  // Save profile
+  document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const savedMsg = document.getElementById('profileSavedMsg');
+    const errorMsg = document.getElementById('profileErrorMsg');
+    savedMsg.classList.add('d-none');
+    errorMsg.classList.add('d-none');
+
+    const payload = {
+      tradeType: document.getElementById('profileTradeType').value.trim(),
+      region: document.getElementById('profileRegion').value.trim(),
+      availability: document.getElementById('profileAvailability').value.trim(),
+      bio: document.getElementById('profileBio').value.trim()
+    };
+
+    const res = await fetch('/profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      errorMsg.classList.remove('d-none');
+      return;
+    }
+
+    savedMsg.classList.remove('d-none');
+    setTimeout(() => location.reload(), 600);
+  });
+
+  // Add service
+  document.getElementById('addServiceForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const savedMsg = document.getElementById('serviceSavedMsg');
+    const errorMsg = document.getElementById('serviceErrorMsg');
+    savedMsg.classList.add('d-none');
+    errorMsg.classList.add('d-none');
+
+    const payload = {
+      title: document.getElementById('serviceTitle').value.trim(),
+      description: document.getElementById('serviceDescription').value.trim(),
+      category: document.getElementById('serviceCategory').value.trim(),
+      pricingType: document.querySelector('input[name="pricingType"]:checked')?.value,
+      basePrice: Number(document.getElementById('serviceBasePrice').value)
+    };
+
+    const res = await fetch('/services', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      errorMsg.classList.remove('d-none');
+      return;
+    }
+
+    savedMsg.classList.remove('d-none');
+    setTimeout(() => location.reload(), 600);
+  });
+
+  // Populate edit service modal
+  document.querySelectorAll('.edit-service-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById('editServiceId').value = btn.dataset.id;
+      document.getElementById('editServiceTitle').value = btn.dataset.title;
+      document.getElementById('editServiceDescription').value = btn.dataset.description;
+      document.getElementById('editServiceCategory').value = btn.dataset.category;
+      document.getElementById('editServiceBasePrice').value = btn.dataset.baseprice;
+
+      const pt = btn.dataset.pricingtype;
+      document.getElementById('editPricingFixed').checked = pt === 'fixed';
+      document.getElementById('editPricingHourly').checked = pt === 'hourly';
+    });
+  });
+
+  // Save edited service
+  document.getElementById('editServiceForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const savedMsg = document.getElementById('editServiceSavedMsg');
+    const errorMsg = document.getElementById('editServiceErrorMsg');
+    savedMsg.classList.add('d-none');
+    errorMsg.classList.add('d-none');
+
+    const serviceId = document.getElementById('editServiceId').value;
+
+    const payload = {
+      title: document.getElementById('editServiceTitle').value.trim(),
+      description: document.getElementById('editServiceDescription').value.trim(),
+      category: document.getElementById('editServiceCategory').value.trim(),
+      pricingType: document.querySelector('input[name="editPricingType"]:checked')?.value,
+      basePrice: Number(document.getElementById('editServiceBasePrice').value)
+    };
+
+    const res = await fetch(`/services/${serviceId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      errorMsg.classList.remove('d-none');
+      return;
+    }
+
+    savedMsg.classList.remove('d-none');
+    setTimeout(() => location.reload(), 600);
+  });
+
+  // Delete service
+  document.querySelectorAll('.delete-service-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Delete this service?')) return;
+
+      const res = await fetch(`/services/${btn.dataset.id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        alert('Error deleting service');
+        return;
+      }
+      location.reload();
+    });
+  });
+
+});
+</script>
+
 </body>
 </html>
