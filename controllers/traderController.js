@@ -146,8 +146,17 @@ exports.showDashboard = async (req, res) => {
       .populate('serviceId', 'title')
       .lean();
 
-    const completedBookingsRaw = await Booking.find({ traderId, status: 'confirmed' })
+    // ✅ Rejected (case-insensitive safety)
+    const rejectedBookingsRaw = await Booking.find({
+      traderId,
+      status: { $regex: /^rejected$/i }
+    })
       .populate('serviceId', 'title')
+      .lean();
+
+    // IMPORTANT: include price fields so we can calculate earnings
+    const completedBookingsRaw = await Booking.find({ traderId, status: 'confirmed' })
+      .populate('serviceId', 'title basePrice pricingType')
       .lean();
 
     const services = await Service.find({ traderId }).lean();
@@ -157,22 +166,88 @@ exports.showDashboard = async (req, res) => {
       serviceTitle: b.serviceId?.title || 'Unknown service'
     }));
 
+    const rejectedBookings = rejectedBookingsRaw.map(b => ({
+      ...b,
+      serviceTitle: b.serviceId?.title || 'Unknown service'
+    }));
+
     const completedBookings = completedBookingsRaw.map(b => ({
       ...b,
       serviceTitle: b.serviceId?.title || 'Unknown service'
     }));
 
+    // ✅ NEW: one list for the "My Jobs" panel + filtering
+    const myJobsBookings = [
+      ...pendingBookings.map(b => ({ ...b, status: 'pending' })),
+      ...rejectedBookings.map(b => ({ ...b, status: 'rejected' })),
+      ...completedBookings.map(b => ({ ...b, status: 'confirmed' }))
+    ].sort((a, c) => {
+      const ad = a.requestedDateTime ? new Date(a.requestedDateTime).getTime() : 0;
+      const cd = c.requestedDateTime ? new Date(c.requestedDateTime).getTime() : 0;
+      return cd - ad; // newest first
+    });
+
+    // ===== Stats =====
+    const totalEarnedFixed = completedBookingsRaw.reduce((sum, b) => {
+      const svc = b.serviceId;
+      if (!svc) return sum;
+      if (svc.pricingType !== 'fixed') return sum;
+      const price = Number(svc.basePrice);
+      if (Number.isNaN(price)) return sum;
+      return sum + price;
+    }, 0);
+
+    const completedCount = completedBookingsRaw.length;
+
+    // Earnings by month (fixed jobs only) for the chart
+    const byMonth = {};
+    completedBookingsRaw.forEach(b => {
+      const svc = b.serviceId;
+      if (!svc || svc.pricingType !== 'fixed') return;
+
+      const price = Number(svc.basePrice);
+      if (Number.isNaN(price)) return;
+
+      const dt = b.requestedDateTime ? new Date(b.requestedDateTime) : null;
+      if (!dt || Number.isNaN(dt.getTime())) return;
+
+      const key = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}`;
+      byMonth[key] = (byMonth[key] || 0) + price;
+    });
+
+    const monthKeys = Object.keys(byMonth).sort();
+    const chartLabels = monthKeys.map(k => {
+      const [y, m] = k.split('-');
+      const d = new Date(Number(y), Number(m) - 1, 1);
+      return d.toLocaleString('en-GB', { month: 'short', year: 'numeric' });
+    });
+    const chartData = monthKeys.map(k => Number(byMonth[k].toFixed(2)));
+
     return res.render('dashboard', {
       trader: req.trader,
+
+      // existing arrays (keep them)
       pendingBookings,
+      rejectedBookings,
       completedBookings,
-      services
+
+      // ✅ NEW: render this in "My Jobs" instead of pendingBookings
+      myJobsBookings,
+
+      services,
+
+      totalEarnedFixed,
+      completedCount,
+      chartLabels,
+      chartData
     });
   } catch (err) {
     console.error(err);
     return res.status(500).send('Error loading dashboard');
   }
 };
+
+
 
 // Update profile (AJAX from modal)
 exports.updateProfile = async (req, res) => {
@@ -230,4 +305,3 @@ exports.showAllTraders = async (req, res) => {
     res.status(500).send('Error loading traders');
   }
 };
-

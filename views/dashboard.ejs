@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Trader Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -20,41 +21,117 @@
 <div class="container">
   <h1 class="mb-4">Dashboard</h1>
 
-  <!-- PROFILE PANEL -->
-  <div class="card mb-4">
-    <div class="card-header d-flex justify-content-between">
-      My Profile
-      <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editProfileModal">
-        Edit Profile
-      </button>
+  <!-- TOP ROW: PROFILE + STATS -->
+  <div class="row g-4 mb-4">
+
+    <!-- PROFILE PANEL -->
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          My Profile
+          <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+            Edit Profile
+          </button>
+        </div>
+        <div class="card-body">
+          <p><strong>Name:</strong> <%= trader.name %></p>
+          <p><strong>Email:</strong> <%= trader.email %></p>
+          <p><strong>Trade Type:</strong> <%= trader.tradeType %></p>
+          <p><strong>Region:</strong> <%= trader.region %></p>
+          <% if (trader.availability) { %>
+            <p><strong>Availability:</strong> <%= trader.availability %></p>
+          <% } %>
+          <% if (trader.bio) { %>
+            <p><strong>Bio:</strong> <%= trader.bio %></p>
+          <% } %>
+        </div>
+      </div>
     </div>
-    <div class="card-body">
-      <p><strong>Name:</strong> <%= trader.name %></p>
-      <p><strong>Email:</strong> <%= trader.email %></p>
-      <p><strong>Trade Type:</strong> <%= trader.tradeType %></p>
-      <p><strong>Region:</strong> <%= trader.region %></p>
-      <% if (trader.availability) { %>
-        <p><strong>Availability:</strong> <%= trader.availability %></p>
-      <% } %>
-      <% if (trader.bio) { %>
-        <p><strong>Bio:</strong> <%= trader.bio %></p>
-      <% } %>
+
+    <!-- STATS PANEL -->
+    <div class="col-lg-6">
+      <div class="card h-100">
+        <div class="card-header">Stats</div>
+        <div class="card-body">
+          <div class="row g-3 mb-3">
+            <div class="col-6">
+              <div class="p-3 border rounded">
+                <div class="text-muted small">Fixed-price earnings</div>
+                <div class="fs-4 fw-semibold">
+                  £<%= (typeof totalEarnedFixed !== 'undefined' ? Number(totalEarnedFixed || 0).toFixed(2) : '0.00') %>
+                </div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="p-3 border rounded">
+                <div class="text-muted small">Completed jobs</div>
+                <div class="fs-4 fw-semibold">
+                  <%= (typeof completedCount !== 'undefined' ? (completedCount || 0) : (completedBookings ? completedBookings.length : 0)) %>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="border rounded p-3">
+            <div class="text-muted small mb-2">Fixed-price earnings by month</div>
+            <canvas id="earningsChart" height="120"></canvas>
+            <% if (!chartLabels || chartLabels.length === 0) { %>
+              <div class="text-muted small mt-2">No fixed-price completed jobs yet.</div>
+            <% } %>
+          </div>
+        </div>
+      </div>
     </div>
+
   </div>
 
+  <!-- MAIN ROW: MY JOBS / COMPLETED JOBS / SERVICES -->
   <div class="row g-4">
 
     <!-- MY JOBS -->
     <div class="col-md-4">
       <div class="card h-100">
-        <div class="card-header">My Jobs</div>
+
+        <!-- ✅ Added filter dropdown -->
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span>My Jobs</span>
+          <select id="jobStatusFilter" class="form-select form-select-sm w-auto">
+            <option value="pending" selected>Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="rejected">Rejected</option>
+            <option value="all">All</option>
+          </select>
+        </div>
+
         <div class="card-body">
-          <ul class="list-group">
-            <% if (pendingBookings && pendingBookings.length > 0) { %>
-              <% pendingBookings.forEach(b => { %>
-                <li class="list-group-item">
+          <ul class="list-group" id="jobsList">
+
+            <% 
+              const allJobs = [
+                ...(pendingBookings || []),
+                ...(completedBookings || []),
+                ...(typeof rejectedBookings !== 'undefined' ? (rejectedBookings || []) : [])
+              ];
+            %>
+
+            <% if (allJobs.length > 0) { %>
+              <% allJobs.forEach(b => { %>
+                <li class="list-group-item job-item" data-status="<%= b.status %>">
                   <strong><%= b.clientName %></strong><br>
-                  <small><%= b.requestedDateTime ? new Date(b.requestedDateTime).toLocaleString('en-GB') : '' %></small>
+
+                  <small>
+                    <%= b.requestedDateTime ? new Date(b.requestedDateTime).toLocaleString('en-GB') : '' %>
+                  </small>
+
+                  <div class="mt-1">
+                    <span class="badge
+                      <%= b.status === 'pending' ? 'bg-warning text-dark' :
+                          b.status === 'confirmed' ? 'bg-success' :
+                          b.status === 'rejected' ? 'bg-danger' : 'bg-secondary' %>">
+                      <%= b.status %>
+                    </span>
+                  </div>
+
                   <div class="mt-2 d-flex gap-1">
                     <button
                       type="button"
@@ -69,20 +146,24 @@
                     >
                       View
                     </button>
-                    <button type="button" class="btn btn-success btn-sm accept-btn" data-id="<%= b._id %>">Accept</button>
-                    <button type="button" class="btn btn-danger btn-sm reject-btn" data-id="<%= b._id %>">Reject</button>
+
+                    <% if (b.status === 'pending') { %>
+                      <button type="button" class="btn btn-success btn-sm accept-btn" data-id="<%= b._id %>">Accept</button>
+                      <button type="button" class="btn btn-danger btn-sm reject-btn" data-id="<%= b._id %>">Reject</button>
+                    <% } %>
                   </div>
                 </li>
               <% }) %>
             <% } else { %>
-              <li class="list-group-item">No pending jobs</li>
+              <li class="list-group-item">No jobs yet</li>
             <% } %>
+
           </ul>
         </div>
       </div>
     </div>
 
-    <!-- COMPLETED JOBS -->
+    <!-- COMPLETED JOBS (unchanged) -->
     <div class="col-md-4">
       <div class="card h-100">
         <div class="card-header">Completed Jobs</div>
@@ -104,7 +185,7 @@
       </div>
     </div>
 
-    <!-- SERVICES -->
+    <!-- SERVICES (unchanged) -->
     <div class="col-md-4">
       <div class="card h-100">
         <div class="card-header d-flex justify-content-between">
@@ -204,8 +285,7 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
 
-       <div class="modal-body">
-        <!-- CHANGED: Trade Type is now a dropdown again -->
+      <div class="modal-body">
         <div class="mb-3">
           <label class="form-label">Trade Type</label>
           <select class="form-select" id="profileTradeType" required>
@@ -231,9 +311,7 @@
 
         <div class="mb-3">
           <label class="form-label">Short Bio</label>
-          <textarea
-  class="form-control"
-  id="profileBio" rows="3" required><%= trader.bio || '' %></textarea>
+          <textarea class="form-control" id="profileBio" rows="3" required><%= trader.bio || '' %></textarea>
         </div>
 
         <div class="alert alert-success d-none" id="profileSavedMsg">Profile updated.</div>
@@ -378,9 +456,56 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+
+   const jobStatusFilter = document.getElementById('jobStatusFilter');
+  const jobItems = document.querySelectorAll('#jobsList .job-item');
+
+  function applyJobFilter() {
+    const selected = (jobStatusFilter?.value || 'all').toLowerCase();
+
+    jobItems.forEach(item => {
+      const status = (item.dataset.status || '').toLowerCase();
+      const show = selected === 'all' || status === selected;
+      item.style.display = show ? '' : 'none';
+    });
+  }
+
+  if (jobStatusFilter) {
+    jobStatusFilter.addEventListener('change', applyJobFilter);
+    applyJobFilter(); // run once on load so default selection works
+  }
+
+  // ===== Chart.js (earnings by month) =====
+  const chartLabels = <%- JSON.stringify(chartLabels || []) %>;
+  const chartData = <%- JSON.stringify(chartData || []) %>;
+
+  if (chartLabels.length && document.getElementById('earningsChart')) {
+    const ctx = document.getElementById('earningsChart');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: chartLabels,
+        datasets: [{
+          label: '£ earned (fixed)',
+          data: chartData,
+          tension: 0.25
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: true }
+        },
+        scales: {
+          y: { beginAtZero: true }
+        }
+      }
+    });
+  }
 
   // View booking modal
   const viewBookingModal = document.getElementById('viewBookingModal');
