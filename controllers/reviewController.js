@@ -56,28 +56,32 @@ exports.createReview = async (req, res) => {
  * GET /reviews/:traderId
  * Returns: { averageRating, reviewCount, reviews: [...] }
  */
+
 exports.getReviewsForTrader = async (req, res) => {
   try {
-    const traderId = (req.params.traderId || '').trim();
-
-    if (!mongoose.Types.ObjectId.isValid(traderId)) {
-      return res.status(400).json({ message: 'Invalid traderId' });
-    }
+    const traderId = req.params.traderId;
 
     const reviews = await Review.find({ traderId })
       .sort({ createdAt: -1 })
-      .select('rating comment reviewerName createdAt')
+      .limit(10)
       .lean();
 
-    const reviewCount = reviews.length;
-    const averageRating =
-      reviewCount === 0
-        ? 0
-        : Number((reviews.reduce((sum, r) => sum + (Number(r.rating) || 0), 0) / reviewCount).toFixed(2));
+    const totalReviews = await Review.countDocuments({ traderId });
 
-    return res.json({ averageRating, reviewCount, reviews });
+    const averageRating = totalReviews
+      ? (await Review.aggregate([
+          { $match: { traderId: new (require('mongoose').Types.ObjectId)(traderId) } },
+          { $group: { _id: '$traderId', avg: { $avg: '$rating' } } }
+        ]))[0]?.avg || 0
+      : 0;
+
+    return res.json({
+      averageRating: Number(averageRating || 0),
+      totalReviews,
+      reviews
+    });
   } catch (err) {
     console.error('getReviewsForTrader error:', err);
-    return res.status(500).json({ message: 'Server error fetching reviews' });
+    return res.status(500).json({ message: 'Server error' });
   }
 };
