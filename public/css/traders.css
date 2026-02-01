@@ -1,0 +1,142 @@
+ /* =========================
+       PAGE BACKGROUND (blur hero)
+    ========================= */
+    body.traders-page {
+      position: relative;
+      min-height: 100vh;
+      background: url('/media/heroimage.jpg') center/cover no-repeat fixed;
+    }
+
+    body.traders-page::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      z-index: -1;
+    }
+
+    /* =========================
+       PAGE TEXT (make readable)
+    ========================= */
+    body.traders-page h1,
+    body.traders-page h5,
+    body.traders-page label {
+      color: #fff;
+    }
+
+    body.traders-page p,
+    body.traders-page .text-muted {
+      color: rgba(255, 255, 255, 0.78) !important;
+    }
+
+    /* =========================
+       GLASS CARDS
+    ========================= */
+    body.traders-page .card {
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      color: #fff;
+    }
+
+    body.traders-page .card-title {
+      color: #fff;
+    }
+
+    body.traders-page .card .border-top {
+      border-top: 1px solid rgba(255, 255, 255, 0.18) !important;
+    }
+
+    /* Hover lift */
+    body.traders-page .trader-card .card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    body.traders-page .trader-card .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+    }
+
+    /* =========================
+       FILTERS (inputs/selects)
+    ========================= */
+    body.traders-page .form-control,
+    body.traders-page .form-select {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: #fff;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    body.traders-page .form-control::placeholder {
+      color: rgba(255, 255, 255, 0.65);
+    }
+
+    body.traders-page .form-select option {
+      color: #111; /* dropdown options need dark text */
+    }
+
+    /* =========================
+       STARS
+    ========================= */
+    .stars {
+      letter-spacing: 1px;
+      font-size: 1.05rem;
+      line-height: 1;
+      user-select: none;
+      color: #f4c150;
+    }
+    .review-snippet {
+      font-size: 0.9rem;
+    }
+
+    /* =========================
+       GLASS MODALS
+    ========================= */
+    body.traders-page .modal-content {
+      background: rgba(20, 20, 20, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      color: #fff;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.6);
+    }
+
+    body.traders-page .modal-header,
+    body.traders-page .modal-footer {
+      border-color: rgba(255, 255, 255, 0.15);
+    }
+
+    body.traders-page .modal .btn-close {
+      filter: invert(1);
+      opacity: 0.8;
+    }
+
+    /* Lists inside modals (services + reviews) */
+    body.traders-page .list-group-item {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #fff;
+    }
+
+    body.traders-page .alert {
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Make muted text inside cards/modals readable */
+    body.traders-page .small.text-muted {
+      color: rgba(255, 255, 255, 0.72) !important;
+    }
+
+    /* Keep bootstrap warning alert readable on dark bg */
+    body.traders-page .alert-warning {
+      background: rgba(255, 193, 7, 0.20);
+      border-color: rgba(255, 193, 7, 0.30);
+      color: #fff;
+    }

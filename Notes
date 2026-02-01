@@ -7,6 +7,4 @@ Put js and css in separate files
 
 
 Could have...
-Star ratings for traders displayed on traders.ejs page
-Average star rating per trader
 Detect and prevent overlapping requests for bookings

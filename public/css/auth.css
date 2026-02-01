@@ -1,0 +1,108 @@
+/* =========================
+   AUTH PAGE: BLURRED HERO BACKGROUND
+========================= */
+body.auth-page {
+  position: relative;
+  min-height: 100vh;
+  background: url('/media/heroimage.jpg') center/cover no-repeat fixed;
+}
+
+/* dark overlay + blur */
+body.auth-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: -1;
+}
+
+/* A wrapper so we can easily center under the navbar */
+.auth-shell {
+  min-height: calc(100vh - 70px); /* navbar height-ish */
+  display: flex;
+  align-items: center;
+  padding: 24px 0;
+}
+
+.auth-row {
+  min-height: calc(100vh - 70px);
+}
+
+/* =========================
+   GLASS CARD
+========================= */
+.auth-card {
+  background: rgba(255, 255, 255, 0.10) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  color: #fff;
+}
+
+/* Inputs on glass */
+body.auth-page .form-control {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+body.auth-page .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+/* Make the divider subtle */
+.auth-divider {
+  border-color: rgba(255, 255, 255, 0.18);
+  opacity: 1;
+}
+
+/* Bottom helper text */
+.auth-help {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.auth-help a {
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: underline;
+}
+
+/* Alerts on dark/glass */
+body.auth-page .alert-danger {
+  background: rgba(220, 53, 69, 0.20);
+  border-color: rgba(220, 53, 69, 0.35);
+  color: #fff;
+}
+
+/* Helpers used by both login + register */
+.auth-divider {
+  border-color: rgba(255, 255, 255, 0.18);
+  opacity: 1;
+}
+
+.auth-help {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.auth-help a {
+  color: rgba(255, 255, 255, 0.92);
+  text-decoration: underline;
+}
+
+.auth-hint {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* Make selects match glass inputs */
+body.auth-page .form-select {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+body.auth-page .form-select option {
+  color: #111; /* options list is native UI; keep readable */
+}
+

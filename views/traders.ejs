@@ -9,20 +9,12 @@
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
     rel="stylesheet"
   />
-  <style>
-    .stars {
-      letter-spacing: 1px;
-      font-size: 1.05rem;
-      line-height: 1;
-      user-select: none;
-      color: #f4c150;
-    }
-    .review-snippet {
-      font-size: 0.9rem;
-    }
-  </style>
-</head>
-<body>
+  <!-- Your brand CSS -->
+  <link rel="stylesheet" href="/css/mainStyle.css">
+  <link rel="stylesheet" href="/css/traders.css">
+  </head>
+
+<body class="traders-page">
 
 <!-- NAVBAR (PUBLIC-SAFE) -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
@@ -31,7 +23,7 @@
 
     <div class="ms-auto">
       <% if (typeof trader !== 'undefined' && trader) { %>
-        <span class="me-3">Welcome, <%= trader.name %></span>
+        <span class="me-3" style="color: rgba(255,255,255,0.85);">Welcome, <%= trader.name %></span>
         <a href="/logout" class="btn btn-outline-danger btn-sm">Logout</a>
       <% } else { %>
         <a href="/services" class="btn btn-outline-primary btn-sm me-2">View Services</a>
@@ -44,7 +36,7 @@
 
 <div class="container py-4">
   <h1 class="mb-3">Trader Directory</h1>
-  <p class="text-muted mb-4">Browse traders, view their services, and read reviews.</p>
+  <p class="mb-4">Browse traders, view their services, and read reviews.</p>
 
   <!-- FILTERS -->
   <div class="row g-2 mb-4">
@@ -165,7 +157,7 @@
 
             <div class="d-flex align-items-center gap-2">
               <div class="stars" id="profileStars">☆☆☆☆☆</div>
-              <div class="text-muted small" id="profileRatingText">No reviews yet</div>
+              <div class="small text-muted" id="profileRatingText">No reviews yet</div>
             </div>
 
             <div class="mt-2">
@@ -356,13 +348,13 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+  // (your JS stays exactly the same — unchanged)
   const ALL_TRADERS = <%- JSON.stringify(traders || [])
     .replace(/</g, '\\u003c')
     .replace(/>/g, '\\u003e')
     .replace(/&/g, '\\u0026')
   %>;
 
-  // ====== Directory filters ======
   const searchInput = document.getElementById('searchInput');
   const tradeTypeFilter = document.getElementById('tradeTypeFilter');
   const regionFilter = document.getElementById('regionFilter');
@@ -400,7 +392,6 @@
   tradeTypeFilter.addEventListener('change', applyFilters);
   regionFilter.addEventListener('input', applyFilters);
 
-  // ====== Modals ======
   const traderProfileModalEl = document.getElementById('traderProfileModal');
   const requestServiceModalEl = document.getElementById('requestServiceModal');
   const requestSuccessModalEl = document.getElementById('requestSuccessModal');
@@ -421,14 +412,12 @@
   const bioBlock = document.getElementById('bioBlock');
   const availabilityBlock = document.getElementById('availabilityBlock');
 
-  // Reviews UI in profile
   const profileStars = document.getElementById('profileStars');
   const profileRatingText = document.getElementById('profileRatingText');
   const profileReviewsEmpty = document.getElementById('profileReviewsEmpty');
   const profileReviewsList = document.getElementById('profileReviewsList');
   const profileReviewBtn = document.getElementById('profileReviewBtn');
 
-  // Request form elements
   const requestForm = document.getElementById('requestServiceForm');
   const requestError = document.getElementById('requestError');
 
@@ -441,7 +430,6 @@
   const jobDescriptionEl = document.getElementById('jobDescription');
   const requestServiceLabel = document.getElementById('requestServiceLabel');
 
-  // Review form elements
   const reviewForm = document.getElementById('reviewTraderForm');
   const reviewTraderLabel = document.getElementById('reviewTraderLabel');
   const reviewTraderId = document.getElementById('reviewTraderId');
@@ -451,8 +439,7 @@
   const reviewComment = document.getElementById('reviewComment');
   const reviewError = document.getElementById('reviewError');
 
-  // ====== Reviews: fetch/cache and render ======
-  const REVIEWS_CACHE = new Map(); // traderId -> { average, count, reviews: [] }
+  const REVIEWS_CACHE = new Map();
 
   async function fetchReviews(traderId) {
     if (!traderId) return { average: 0, count: 0, reviews: [] };
@@ -465,8 +452,6 @@
       if (!res.ok) throw new Error('Failed');
       const data = await res.json();
 
-      // Expecting reviewController.getReviewsForTrader to return:
-      // { averageRating: Number, totalReviews: Number, reviews: Array }
       const normalized = {
         average: Number(data.averageRating || 0),
         count: Number(data.totalReviews || 0),
@@ -483,7 +468,7 @@
   }
 
   function starsText(avg) {
-    const full = Math.round(Number(avg || 0)); // simple average -> rounded stars
+    const full = Math.round(Number(avg || 0));
     const clamped = Math.max(0, Math.min(5, full));
     return '★★★★★'.slice(0, clamped) + '☆☆☆☆☆'.slice(0, 5 - clamped);
   }
@@ -508,7 +493,7 @@
       return;
     }
 
-    const recent = data.reviews.slice(0, 2); // show 2 on card
+    const recent = data.reviews.slice(0, 2);
     recentEl.innerHTML = recent.map(r => {
       const who = escapeHtml(r.reviewerName || 'Anonymous');
       const comment = escapeHtml(r.comment || '');
@@ -568,22 +553,18 @@
     }));
   }
 
-  // Load reviews for all cards once
   document.addEventListener('DOMContentLoaded', () => {
     hydrateAllCards();
   });
 
-  // ====== Trader profile modal: show embedded services + allow booking + show reviews ======
   traderProfileModalEl.addEventListener('show.bs.modal', async (event) => {
     const btn = event.relatedTarget;
     const traderId = btn.dataset.traderId;
 
-    // Populate profile fields
     profileTraderName.textContent = btn.dataset.traderName || '';
     profileTradeType.textContent = btn.dataset.traderTradetype || '';
     profileRegion.textContent = btn.dataset.traderRegion || '';
 
-    // Set Review Trader button context
     profileReviewBtn.dataset.traderId = traderId || '';
     profileReviewBtn.dataset.traderName = btn.dataset.traderName || '';
 
@@ -605,16 +586,13 @@
       profileAvailability.textContent = '';
     }
 
-    // Reviews (fetch + render)
     const reviewsData = await fetchReviews(traderId);
     renderProfileReviews(traderId, reviewsData);
 
-    // Reset services UI
     servicesEmpty.classList.add('d-none');
     servicesList.classList.add('d-none');
     servicesList.innerHTML = '';
 
-    // Find trader + services from embedded data
     const traderObj = ALL_TRADERS.find(t => String(t._id) === String(traderId));
     const services = (traderObj && traderObj.services) ? traderObj.services : [];
 
@@ -654,20 +632,16 @@
           </div>
         </div>
       `;
-
       servicesList.appendChild(item);
     });
   });
 
-  // Open review modal (from card top button)
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('.review-trader-btn');
     if (!btn) return;
-
     openReviewModal(btn.dataset.traderId, btn.dataset.traderName);
   });
 
-  // Open review modal (from profile modal button)
   profileReviewBtn.addEventListener('click', () => {
     openReviewModal(profileReviewBtn.dataset.traderId, profileReviewBtn.dataset.traderName);
   });
@@ -679,7 +653,6 @@
     reviewTraderId.value = traderId || '';
     reviewTraderLabel.textContent = `Review Trader: ${traderName || 'Trader'}`;
 
-    // reset fields
     reviewerName.value = '';
     reviewerEmail.value = '';
     reviewRating.value = '';
@@ -688,12 +661,10 @@
     reviewTraderModal.show();
   }
 
-  // Submit review
   reviewForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     reviewError.classList.add('d-none');
 
-    // basic client-side validation
     if (!reviewForm.checkValidity()) {
       reviewForm.classList.add('was-validated');
       return;
@@ -719,16 +690,13 @@
         return;
       }
 
-      // close modal
       bootstrap.Modal.getInstance(reviewTraderModalEl)?.hide();
 
-      // refresh this trader's reviews cache + UI
       REVIEWS_CACHE.delete(String(payload.traderId));
       const updated = await fetchReviews(payload.traderId);
 
       renderCardReviews(payload.traderId, updated);
 
-      // if profile modal currently open for same trader, refresh it too
       if (profileReviewBtn.dataset.traderId && String(profileReviewBtn.dataset.traderId) === String(payload.traderId)) {
         renderProfileReviews(payload.traderId, updated);
       }
@@ -738,30 +706,24 @@
     }
   });
 
-  // Click "Request" inside trader profile modal
   document.addEventListener('click', (e) => {
     const btn = e.target.closest('.request-from-trader-btn');
     if (!btn) return;
 
-    // set hidden ids
     serviceIdEl.value = btn.dataset.serviceId || '';
     traderIdEl.value = btn.dataset.traderId || '';
 
-    // label
     requestServiceLabel.textContent =
       `Request Service: ${btn.dataset.serviceTitle || 'Service'} (${btn.dataset.traderName || 'Trader'})`;
 
-    // clear any previous error
     requestError.classList.add('d-none');
 
-    // close profile modal then open request modal
     const traderProfileInstance = bootstrap.Modal.getInstance(traderProfileModalEl);
     traderProfileInstance?.hide();
 
     requestServiceModal.show();
   });
 
-  // Submit booking request
   requestForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     requestError.classList.add('d-none');
@@ -788,7 +750,6 @@
         return;
       }
 
-      // Hide request modal, reset, show success
       bootstrap.Modal.getInstance(requestServiceModalEl)?.hide();
       requestForm.reset();
       requestSuccessModal.show();

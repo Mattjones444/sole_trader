@@ -1,0 +1,186 @@
+/* =========================
+   BRAND COLOURS
+========================= */
+:root {
+  --carbon-black: #252422;
+  --caramel: #E7A977;
+  --caramel-dark: #d69560;
+  --star-yellow: #f5c518;
+}
+
+/* =========================
+   NAVBAR
+========================= */
+.navbar {
+  background-color: var(--carbon-black) !important;
+}
+
+.navbar-brand {
+  color: var(--caramel) !important;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.navbar .btn-outline-primary {
+  color: var(--caramel);
+  border-color: var(--caramel);
+}
+
+.navbar .btn-outline-primary:hover {
+  background-color: var(--caramel);
+  color: var(--carbon-black);
+}
+
+/* =========================
+   BUTTONS
+========================= */
+.btn-primary {
+  background-color: var(--caramel);
+  border-color: var(--caramel);
+  color: var(--carbon-black);
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background-color: var(--caramel-dark);
+  border-color: var(--caramel-dark);
+  color: var(--carbon-black);
+}
+
+.btn-outline-light {
+  border-color: var(--caramel);
+  color: var(--caramel);
+}
+
+.btn-outline-light:hover {
+  background-color: var(--caramel);
+  color: var(--carbon-black);
+}
+
+/* =========================
+   HERO SECTION
+========================= */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* FIX: use the public URL path (NOT "public/...") */
+  background-image: url('/media/heroimage.jpg');
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  text-align: center;
+}
+
+/* Dark overlay for contrast */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+/* Keep hero content above overlay */
+.hero .container {
+  position: relative;
+  z-index: 2;
+}
+
+/* Hero text */
+.hero h1 {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.hero p {
+  color: #f1f1f1;
+  font-size: 1.15rem;
+}
+
+/* =========================
+   STAR RATINGS (GLOBAL)
+========================= */
+.stars {
+  color: var(--star-yellow);
+  letter-spacing: 1px;
+  font-size: 1.05rem;
+  line-height: 1;
+  user-select: none;
+}
+
+/* Muted fallback (no reviews yet) */
+.stars.text-muted {
+  color: #bbb !important;
+}
+
+/* =========================
+   GENERAL TWEAKS
+========================= */
+body {
+  background-color: #ffffff;
+}
+
+
+/* =========================
+   BLURRED BACKGROUND (SERVICES)
+========================= */
+body.services-page {
+  position: relative;
+  min-height: 100vh;
+  background: url('/media/heroimage.jpg') center / cover no-repeat fixed;
+}
+
+body.services-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.35);
+  z-index: -1;
+}
+
+body.services-page h1,
+body.services-page p {
+  color: #ffffff;
+}
+
+/* Optional: soften paragraph text slightly */
+body.services-page p {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+body.services-page .text-muted {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+/* Services page: glass cards */
+body.services-page .service-card .card {
+  background: rgba(37, 36, 34, 0.55); /* carbon-black-ish */
+  border: 1px solid rgba(231, 169, 119, 0.25); /* caramel tint */
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  color: #fff;
+  backdrop-filter: blur(10px);
+  border-radius: 14px;
+}
+
+body.services-page .service-card .card .text-muted {
+  color: rgba(255, 255, 255, 0.75) !important;
+}
+
+body.services-page .service-card .card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.services-page .service-card .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
+}
+
+
+
