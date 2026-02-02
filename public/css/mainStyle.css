@@ -182,5 +182,32 @@ body.services-page .service-card .card:hover {
   box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
 }
 
+/* =========================
+   SERVICE FILTER BUTTONS
+========================= */
+.filter-btn {
+  color: #243332;                     /* strong dark text */
+  background: rgba(184, 211, 209, 0.75); /* MUCH less transparent */
+  border: 1px solid rgba(184, 211, 209, 0.9);
+  font-weight: 600;
 
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.filter-btn:hover,
+.filter-btn:focus {
+  background-color: #B8D3D1;
+  color: #243332;
+  transform: translateY(-1px);
+}
+
+/* Active filter */
+.filter-btn.active {
+  background-color: #B8D3D1;
+  border-color: #B8D3D1;
+  color: #243332;
+}
 
