@@ -2,17 +2,14 @@
 const mongoose = require('mongoose');
 const Review = require('../models/Review');
 
-/**
- * POST /reviews
- * Body: { traderId, rating, comment, reviewerName? }
- */
+//Create a new review
 exports.createReview = async (req, res) => {
   try {
     const traderId = (req.body.traderId || '').trim();
     const reviewerName = (req.body.reviewerName || '').trim();
     const comment = (req.body.comment || '').trim();
 
-    // rating can arrive as string from forms
+    
     const ratingRaw = req.body.rating;
     const rating = Number(ratingRaw);
 
@@ -26,7 +23,7 @@ exports.createReview = async (req, res) => {
       return res.status(400).json({ message: 'Rating must be an integer between 1 and 5' });
     }
 
-    // Validate comment (required + length)
+    // Validate comment
     if (!comment) {
       return res.status(400).json({ message: 'Comment is required' });
     }
@@ -52,11 +49,7 @@ exports.createReview = async (req, res) => {
   }
 };
 
-/**
- * GET /reviews/:traderId
- * Returns: { averageRating, reviewCount, reviews: [...] }
- */
-
+//Get reviews for a specified trader
 exports.getReviewsForTrader = async (req, res) => {
   try {
     const traderId = req.params.traderId;

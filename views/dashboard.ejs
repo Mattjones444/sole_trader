@@ -26,7 +26,7 @@
 
 
 <div class="container">
-  <h1 class="mb-4 mt-4fgtf">Dashboard</h1>
+  <h1 class="mb-4 mt-4">Dashboard</h1>
 
   <!-- TOP ROW: PROFILE + STATS -->
   <div class="row g-4 mb-4">
@@ -147,8 +147,8 @@
                       data-bs-target="#viewBookingModal"
                       data-client="<%= b.clientName %>"
                       data-email="<%= b.clientEmail %>"
-                      data-location="<%- (b.location || '').replace(/"/g, '&quot;') %>"
-                      data-description="<%- (b.jobDescription || '').replace(/"/g, '&quot;') %>"
+                      data-location="<%= b.location || '' %>"
+                      data-description="<%= b.jobDescription || '' %>"
                       data-datetime="<%= b.requestedDateTime ? new Date(b.requestedDateTime).toISOString() : '' %>"
                     >
                       View
@@ -212,9 +212,9 @@
                       data-bs-toggle="modal"
                       data-bs-target="#editServiceModal"
                       data-id="<%= s._id %>"
-                      data-title="<%- (s.title || '').replace(/"/g, '&quot;') %>"
-                      data-description="<%- (s.description || '').replace(/"/g, '&quot;') %>"
-                      data-category="<%- (s.category || '').replace(/"/g, '&quot;') %>"
+                      data-title="<%= s.title || '' %>"
+                      data-description="<%= s.description || '' %>"
+                      data-category="<%= s.category || '' %>"
                       data-pricingtype="<%= s.pricingType %>"
                       data-baseprice="<%= s.basePrice %>">
                       Edit

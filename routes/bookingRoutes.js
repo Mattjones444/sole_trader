@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const bookingController = require('../controllers/bookingController');
-const traderController = require('../controllers/traderController'); // ✅ add this
+const traderController = require('../controllers/traderController'); 
 
 // POST route to create a booking (guest)
 router.post('/book-service', bookingController.createBooking);

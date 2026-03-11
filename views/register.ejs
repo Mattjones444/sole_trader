@@ -41,6 +41,7 @@
               <div class="mb-3">
                 <label class="form-label text-white">Full Name</label>
                 <input type="text" class="form-control" name="name" required>
+                <div class="invalid-feedback">Please enter your name.</div>
               </div>
 
               <div class="mb-3">
@@ -83,6 +84,9 @@
                   required
                   minlength="6"
                 >
+                <div class="invalid-feedback">
+                  Password must be at least 6 characters.
+                </div>
                 <div class="form-text auth-hint">Minimum 6 characters</div>
               </div>
 
@@ -97,12 +101,17 @@
                   <option>Gardening</option>
                   <option>Painting</option>
                 </select>
-                <div class="invalid-feedback">Please select a trade type.</div>
+                <div class="invalid-feedback">
+                  Please select a trade type.
+                </div>
               </div>
 
               <div class="mb-4">
                 <label class="form-label text-white">Region / Town</label>
                 <input type="text" class="form-control" name="region" required>
+                <div class="invalid-feedback">
+                  Please enter your region or town.
+                </div>
               </div>
 
               <button
@@ -133,8 +142,15 @@
 
 <script>
 (() => {
+
+  const form = document.getElementById('registerForm');
+
+  const nameInput = form.querySelector('input[name="name"]');
   const usernameInput = document.getElementById('username');
   const emailInput = document.getElementById('email');
+  const passwordInput = form.querySelector('input[name="password"]');
+  const tradeTypeInput = form.querySelector('select[name="tradeType"]');
+  const regionInput = form.querySelector('input[name="region"]');
   const submitBtn = document.getElementById('submitBtn');
 
   const emailFormatError = document.getElementById('emailFormatError');
@@ -145,54 +161,74 @@
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+  function fieldsComplete() {
+    return (
+      nameInput.value.trim() !== "" &&
+      passwordInput.value.trim().length >= 6 &&
+      tradeTypeInput.value !== "" &&
+      regionInput.value.trim() !== ""
+    );
+  }
+
+  function updateSubmitState() {
+    submitBtn.disabled = !(fieldsComplete() && usernameOk && emailOk);
+  }
+
   async function checkAvailability() {
+
     const username = usernameInput.value.trim();
     const email = emailInput.value.trim();
 
-    if (email) {
-      const formatValid = emailRegex.test(email);
+    usernameOk = false;
+    emailOk = false;
 
-      if (!formatValid) {
-        emailOk = false;
-        emailInput.classList.add('is-invalid');
-        emailInput.classList.remove('is-valid');
-        emailFormatError.classList.remove('d-none');
-        emailTakenError.classList.add('d-none');
-        submitBtn.disabled = true;
-        return;
-      }
-
-      emailFormatError.classList.add('d-none');
+    if (!email) {
+      updateSubmitState();
+      return;
     }
+
+    if (!emailRegex.test(email)) {
+      emailInput.classList.add('is-invalid');
+      emailInput.classList.remove('is-valid');
+      emailFormatError.classList.remove('d-none');
+      emailTakenError.classList.add('d-none');
+      updateSubmitState();
+      return;
+    }
+
+    emailFormatError.classList.add('d-none');
 
     const params = new URLSearchParams();
     if (username) params.append('username', username);
     if (email) params.append('email', email);
 
     try {
+
       const res = await fetch(`/auth/check-availability?${params}`);
       const data = await res.json();
 
       if (username) {
         usernameOk = data.usernameAvailable;
-        usernameInput.classList.toggle('is-invalid', !usernameOk);
         usernameInput.classList.toggle('is-valid', usernameOk);
+        usernameInput.classList.toggle('is-invalid', !usernameOk);
       }
 
       if (email) {
         emailOk = data.emailAvailable;
-        emailInput.classList.toggle('is-invalid', !emailOk);
         emailInput.classList.toggle('is-valid', emailOk);
+        emailInput.classList.toggle('is-invalid', !emailOk);
         emailTakenError.classList.toggle('d-none', emailOk);
       }
 
-      submitBtn.disabled = !(usernameOk && emailOk);
+      updateSubmitState();
+
     } catch (err) {
       console.error(err);
     }
   }
 
   let debounceTimer;
+
   function debounceCheck() {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(checkAvailability, 400);
@@ -200,6 +236,22 @@
 
   usernameInput.addEventListener('input', debounceCheck);
   emailInput.addEventListener('input', debounceCheck);
+
+  nameInput.addEventListener('input', updateSubmitState);
+  passwordInput.addEventListener('input', updateSubmitState);
+  tradeTypeInput.addEventListener('change', updateSubmitState);
+  regionInput.addEventListener('input', updateSubmitState);
+
+  form.addEventListener('submit', e => {
+
+    form.classList.add('was-validated');
+
+    if (!fieldsComplete() || !usernameOk || !emailOk) {
+      e.preventDefault();
+    }
+
+  });
+
 })();
 </script>
 

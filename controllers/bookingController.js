@@ -3,9 +3,7 @@ const Trader = require('../models/Trader');
 const Service = require('../models/Service');
 const { sendTemplateMail } = require('../utils/mailer');
 
-/* =========================
-   CREATE BOOKING (CLIENT)
-========================= */
+//Create a booking
 exports.createBooking = async (req, res) => {
   try {
     const {
@@ -31,7 +29,7 @@ exports.createBooking = async (req, res) => {
       return res.status(400).json({ error: 'All fields are required.' });
     }
 
-    // Fetch trader + service (for email content)
+    // Fetch trader + service (for email)
     const [trader, service] = await Promise.all([
       Trader.findById(traderId).lean(),
       Service.findById(serviceId).lean()
@@ -56,7 +54,7 @@ exports.createBooking = async (req, res) => {
 
     await booking.save();
 
-    // 🔔 Email trader (non-blocking)
+    // Email trader
     (async () => {
       try {
         await sendTemplateMail({
@@ -90,9 +88,7 @@ exports.createBooking = async (req, res) => {
   }
 };
 
-/* =========================
-   ACCEPT BOOKING (TRADER)
-========================= */
+//Accept booking
 exports.acceptBooking = async (req, res) => {
   try {
     const bookingId = req.params.id;
@@ -113,7 +109,7 @@ exports.acceptBooking = async (req, res) => {
     booking.status = 'confirmed';
     await booking.save();
 
-    // 🔔 Email client (non-blocking)
+    // Email client
     (async () => {
       try {
         await sendTemplateMail({
@@ -141,9 +137,7 @@ exports.acceptBooking = async (req, res) => {
   }
 };
 
-/* =========================
-   REJECT BOOKING (TRADER)
-========================= */
+//reject booking
 exports.rejectBooking = async (req, res) => {
   try {
     const bookingId = req.params.id;
@@ -164,7 +158,7 @@ exports.rejectBooking = async (req, res) => {
     booking.status = 'rejected';
     await booking.save();
 
-    // 🔔 Email client (non-blocking)
+    // Email client
     (async () => {
       try {
         await sendTemplateMail({
